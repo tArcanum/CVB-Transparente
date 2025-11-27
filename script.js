@@ -246,6 +246,7 @@ function prepareData(rawItems) {
 }
 
 // Algoritmo Core: allocate_balanced (Réplica do knapsack_solver.py)
+// Algoritmo Core: allocate_balanced (Com proteção contra travamento)
 function allocateBalanced(itemsDisponiveis, orcamentoDisponivel) {
     let resultado = {}; // ID -> Qtde Comprada (cotas)
     itemsDisponiveis.forEach(i => resultado[i.id] = 0);
@@ -265,10 +266,20 @@ function allocateBalanced(itemsDisponiveis, orcamentoDisponivel) {
         };
     });
 
-    let targetLevel = 1.0; // Começa em 1.0 (Python logic)
+    let targetLevel = 1.0; 
+    
+    // PROTEÇÃO CONTRA TRAVAMENTO (Circuit Breaker)
+    let loops = 0;
+    const MAX_LOOPS = 100000; // Limite de segurança: 100 mil iterações
 
     while (orcamentoRestante >= 0.01) {
-        
+        loops++;
+        // Se passar do limite, para o cálculo para não travar o navegador
+        if (loops > MAX_LOOPS) {
+            console.warn("Cálculo interrompido por segurança (limite de iterações atingido).");
+            break;
+        }
+
         // 1. Identifica itens "ativos"
         let activeCandidates = [];
         
@@ -280,8 +291,6 @@ function allocateBalanced(itemsDisponiveis, orcamentoDisponivel) {
             if (bought >= item.qtde) return; 
 
             // Calcula cobertura atual
-            // Fórmula Python: curr_cov = (bought * item["custo"]) / item_data[id_]["val_real"]
-            // bought é qtd de cotas. item["custo"] é preço da cota.
             const currCov = (bought * itemData[id].custo) / itemData[id].val_real;
 
             if (currCov < targetLevel - 1e-6) {
@@ -299,21 +308,20 @@ function allocateBalanced(itemsDisponiveis, orcamentoDisponivel) {
         if (activeCandidates.length === 0) {
             // Verifica se sobrou estoque em algum lugar
             const anyStock = itemsDisponiveis.some(i => resultado[i.id] < i.qtde);
-            if (!anyStock) break; // Acabou estoque de tudo
+            
+            // Se não tem estoque ou se não tem mais dinheiro útil, encerra
+            if (!anyStock || orcamentoRestante < 0.01) break; 
 
-            targetLevel += 1.0; // Sobe o nível (Python: target_level += 1.0)
+            targetLevel += 1.0; 
             continue;
         }
 
         // 3. Filtra apenas a ELITE (Maior Prioridade Disponível)
         const maxPrio = Math.max(...activeCandidates.map(c => c.item.prioridade));
         
-        // Cria Min-Heap
         const heap = new MinHeap();
         activeCandidates.forEach(cand => {
             if (cand.item.prioridade === maxPrio) {
-                // Heap armazena { cov, cost, id }
-                // Mas aqui guardamos objeto completo para facilitar
                 heap.push({
                     cov: cand.cov,
                     cost: itemData[cand.item.id].custo,
@@ -324,32 +332,30 @@ function allocateBalanced(itemsDisponiveis, orcamentoDisponivel) {
 
         // 4. Processamento em LOTE dentro do Heap
         while (!heap.isEmpty() && orcamentoRestante >= 0.01) {
-            const top = heap.pop(); // Remove o menor (menor cobertura)
+            // Verificação extra de segurança interna
+            if (loops++ > MAX_LOOPS) break;
+
+            const top = heap.pop(); 
             const id = top.id;
             const cov = top.cov;
             const cost = top.cost;
 
-            // Descobre cobertura do próximo para calcular o GAP
             const nextNode = heap.peek();
             let nextCov = nextNode ? nextNode.cov : targetLevel;
 
             let gap = nextCov - cov;
 
-            // Variável para qtd a comprar
             let quotasToBuy = 0;
 
             if (gap < 1e-9) {
                 quotasToBuy = 1;
             } else {
-                // Mágica Matemática do Python:
-                // quotas_float = (gap * val_real) / cost
                 const valReal = itemData[id].val_real;
                 const quotasFloat = (gap * valReal) / cost;
                 quotasToBuy = Math.floor(quotasFloat);
                 if (quotasToBuy < 1) quotasToBuy = 1;
             }
 
-            // Restrições (Orçamento e Estoque)
             const stockLeft = itemData[id].qtde - resultado[id];
             quotasToBuy = Math.min(quotasToBuy, stockLeft);
 
@@ -360,17 +366,14 @@ function allocateBalanced(itemsDisponiveis, orcamentoDisponivel) {
                 continue;
             }
 
-            // Executa a compra
             const totalCost = quotasToBuy * cost;
             resultado[id] += quotasToBuy;
             orcamentoRestante -= totalCost;
             custoTotalAlocado += totalCost;
 
-            // Recalcula nova cobertura
             const newBought = resultado[id];
             const newCov = (newBought * cost) / itemData[id].val_real;
 
-            // Se ainda não terminou e está abaixo da meta, volta pro Heap
             if (newBought < itemData[id].qtde && newCov < targetLevel - 1e-6) {
                 if (orcamentoRestante >= cost) {
                     heap.push({
@@ -385,7 +388,6 @@ function allocateBalanced(itemsDisponiveis, orcamentoDisponivel) {
 
     return { allocated: resultado, remainingBudget: orcamentoRestante };
 }
-
 // Wrapper Principal (Bridge)
 function calculateDonation(amount) {
     if (typeof ITENS_DB === 'undefined') {
@@ -645,12 +647,11 @@ function setupDonationCalculator() {
     }
   };
 
-  // Debounce
+// Debounce (Alterado para 500ms para evitar travamento ao digitar rápido)
   let timerId;
   const handleUpdate = (val) => {
     clearTimeout(timerId);
     timerId = setTimeout(() => {
-        // Limpa formatação de moeda se houver (ex: R$ 1.000,00 -> 1000.00)
         let cleanVal = String(val).replace(/[^\d,.-]/g, '').replace(',','.');
         const num = parseFloat(cleanVal);
         
@@ -659,7 +660,7 @@ function setupDonationCalculator() {
             renderResults(result);
             buttons.forEach(btn => btn.classList.toggle("is-active", parseFloat(btn.dataset.amount) === num));
         }
-    }, 200);
+    }, 500); // <--- Mudei de 200 para 500
   };
 
   input.addEventListener("input", (e) => handleUpdate(e.target.value));
