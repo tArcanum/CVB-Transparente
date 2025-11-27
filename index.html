@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Cruz Vermelha Brasileira – Página de Doações</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-content">
+        <div class="brand">
+          <span class="brand-logo">✚</span>
+          <div class="brand-text">
+            <span id="organizationName" class="brand-name">Cruz Vermelha Brasileira</span>
+            <span class="brand-slogan">Juntos salvamos vidas</span>
+          </div>
+        </div>
+        <nav class="main-nav">
+          <button class="nav-toggle" aria-label="Abrir menu de navegação">
+            ☰
+          </button>
+          <ul class="nav-list">
+            <li><a href="#home-section" data-section="home-section" class="nav-link is-active">Início</a></li>
+            <li><a href="#about-section" data-section="about-section" class="nav-link">Institucional</a></li>
+            <li><a href="#transparency-section" data-section="transparency-section" class="nav-link">Transparência</a></li>
+            <li><a href="#projects-section" data-section="projects-section" class="nav-link">Projetos</a></li>
+            <li><a href="#testimonials-section" data-section="testimonials-section" class="nav-link">Depoimentos</a></li>
+            <li><a href="#contact-section" data-section="contact-section" class="nav-link">Contato</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- Seção inicial / Hero + Calculadora de doação -->
+      <section id="home-section" class="section is-visible">
+        <div class="container hero">
+          <div class="hero-text">
+            <h1 id="mainSlogan" class="hero-title">
+              Sua doação transforma emergências em esperança
+            </h1>
+            <p id="heroSubtitle" class="hero-subtitle">
+              Há mais de 100 anos a Cruz Vermelha Brasileira atua na prevenção e no atendimento
+              a pessoas em situação de vulnerabilidade, em desastres naturais, emergências de
+              saúde e ações humanitárias em todo o país.
+            </p>
+            <div class="hero-highlights">
+              <div class="hero-stat">
+                <span class="hero-stat-number">+120</span>
+                <span class="hero-stat-label">anos de atuação</span>
+              </div>
+              <div class="hero-stat">
+                <span class="hero-stat-number">26</span>
+                <span class="hero-stat-label">filiais estaduais</span>
+              </div>
+              <div class="hero-stat">
+                <span class="hero-stat-number">milhares</span>
+                <span class="hero-stat-label">de voluntários mobilizados</span>
+              </div>
+            </div>
+          </div>
+
+          <aside class="donation-calculator" aria-label="Calculadora de impacto da doação">
+            <h2 class="donation-title">Veja o impacto da sua doação</h2>
+            <p class="donation-description">
+              Escolha um valor ou digite um valor personalizado para visualizar quantas pessoas
+              podem ser alcançadas com a sua contribuição.
+            </p>
+
+            <div class="quick-amounts" role="radiogroup" aria-label="Valores sugeridos de doação">
+              <button type="button" class="amount-btn is-active" data-amount="50">R$ 50</button>
+              <button type="button" class="amount-btn" data-amount="100">R$ 100</button>
+              <button type="button" class="amount-btn" data-amount="150">R$ 150</button>
+              <button type="button" class="amount-btn" data-amount="200">R$ 200</button>
+            </div>
+
+            <div class="donation-input-wrapper">
+              <label for="donationAmount" class="donation-label">Ou informe outro valor:</label>
+              <div class="donation-input-group">
+                <span class="currency-prefix">R$</span>
+                <input
+                  id="donationAmount"
+                  type="number"
+                  min="10"
+                  step="10"
+                  value="50"
+                  class="donation-input"
+                  aria-describedby="donation-help"
+                />
+              </div>
+            </div>
+            <p id="donation-help" class="donation-help">
+              Valor mínimo sugerido: R$ 10,00. Você pode ajustar o valor a qualquer momento.
+            </p>
+
+            <div class="impact-grid">
+              <div class="impact-card">
+                <span class="impact-label">Cestas básicas</span>
+                <span id="impactBaskets" class="impact-value">1</span>
+                <span class="impact-detail">1 cesta estimada a cada R$ 80,00</span>
+              </div>
+              <div class="impact-card">
+                <span class="impact-label">Atendimentos de saúde</span>
+                <span id="impactHealth" class="impact-value">0</span>
+                <span class="impact-detail">1 atendimento estimado a cada R$ 120,00</span>
+              </div>
+              <div class="impact-card">
+                <span class="impact-label">Kits de higiene</span>
+                <span id="impactHygiene" class="impact-value">1</span>
+                <span class="impact-detail">1 kit estimado a cada R$ 30,00</span>
+              </div>
+            </div>
+
+            <button type="button" class="btn-primary donation-cta">
+              Quero doar agora
+            </button>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Seção Institucional -->
+      <section id="about-section" class="section">
+        <div class="container section-content">
+          <h2 id="aboutTitle" class="section-title">Quem somos</h2>
+          <p>
+            A Cruz Vermelha Brasileira é uma instituição humanitária, sem fins lucrativos,
+            integrante do Movimento Internacional da Cruz Vermelha e do Crescente Vermelho.
+            Sua missão é prevenir e aliviar o sofrimento humano em todas as circunstâncias,
+            protegendo a vida e a saúde e promovendo a dignidade das pessoas.
+          </p>
+          <p>
+            Atuamos em parceria com órgãos públicos, empresas e a sociedade civil, promovendo
+            ações educativas, campanhas de arrecadação, resposta a emergências e projetos
+            sociais contínuos em diversas regiões do país.
+          </p>
+
+          <div class="about-grid">
+            <article class="about-card">
+              <h3>Princípios fundamentais</h3>
+              <ul>
+                <li>Humanidade</li>
+                <li>Imparcialidade</li>
+                <li>Neutralidade</li>
+                <li>Independência</li>
+                <li>Voluntariado</li>
+                <li>Unidade e Universalidade</li>
+              </ul>
+            </article>
+            <article class="about-card">
+              <h3>Como atuamos</h3>
+              <ul>
+                <li>Resposta a desastres e emergências</li>
+                <li>Primeiros socorros e capacitações em saúde</li>
+                <li>Projetos sociais em comunidades vulneráveis</li>
+                <li>Campanhas de arrecadação de alimentos, roupas e itens de higiene</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção Transparência -->
+      <section id="transparency-section" class="section section-alt">
+        <div class="container section-content">
+          <h2 id="transparencyTitle" class="section-title">Transparência e prestação de contas</h2>
+          <p>
+            Trabalhamos com rigor na gestão dos recursos recebidos. Toda doação é contabilizada
+            e direcionada a projetos específicos, sempre seguindo normas de governança e auditoria
+            independentes.
+          </p>
+
+          <div class="transparency-grid">
+            <article class="transparency-card">
+              <h3>Prestação de contas</h3>
+              <p>
+                Relatórios anuais apresentam o detalhamento das receitas, despesas e principais
+                resultados alcançados com o apoio de pessoas físicas e jurídicas.
+              </p>
+            </article>
+            <article class="transparency-card">
+              <h3>Uso dos recursos</h3>
+              <ul>
+                <li>Ajuda humanitária em desastres naturais</li>
+                <li>Programas de saúde e prevenção</li>
+                <li>Projetos contínuos em comunidades vulneráveis</li>
+                <li>Formação e apoio a voluntários</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção Projetos -->
+      <section id="projects-section" class="section">
+        <div class="container section-content">
+          <h2 class="section-title">Projetos em destaque</h2>
+          <div class="projects-grid">
+            <article class="project-card">
+              <h3>Apoio a desastres naturais</h3>
+              <p>
+                Mobilização rápida de voluntários, distribuição de alimentos, água potável,
+                itens de higiene e apoio psicossocial a famílias afetadas por enchentes,
+                deslizamentos e outras emergências.
+              </p>
+            </article>
+            <article class="project-card">
+              <h3>Saúde e prevenção</h3>
+              <p>
+                Ações educativas em primeiros socorros, campanhas de vacinação em parceria
+                com órgãos públicos e orientação em saúde comunitária.
+              </p>
+            </article>
+            <article class="project-card">
+              <h3>Projetos sociais contínuos</h3>
+              <p>
+                Atividades com crianças, adolescentes e idosos em situação de vulnerabilidade,
+                com foco em educação, inclusão social e promoção da dignidade humana.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção Depoimentos -->
+      <section id="testimonials-section" class="section section-alt">
+        <div class="container section-content">
+          <h2 class="section-title">Histórias reais, impacto concreto</h2>
+          <div class="testimonials-grid">
+            <figure class="testimonial">
+              <blockquote>
+                “Depois da enchente, perdemos praticamente tudo. A Cruz Vermelha foi uma das
+                primeiras a chegar com cestas básicas e atendimento. A sensação era de que
+                alguém se importava com a nossa família.”
+              </blockquote>
+              <figcaption>Maria, moradora de área atingida por enchentes</figcaption>
+            </figure>
+            <figure class="testimonial">
+              <blockquote>
+                “Participar como voluntário me fez enxergar o quanto uma atitude simples pode
+                mudar o dia de alguém. A estrutura da Cruz Vermelha nos orienta e garante
+                que a ajuda chegue a quem mais precisa.”
+              </blockquote>
+              <figcaption>João, voluntário</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção Contato -->
+      <section id="contact-section" class="section">
+        <div class="container section-content contact-section">
+          <div>
+            <h2 class="section-title">Fale conosco</h2>
+            <p>
+              Para dúvidas, propostas de parceria ou informações sobre como se voluntariar,
+              entre em contato com a Cruz Vermelha Brasileira em sua região ou com a sede nacional.
+            </p>
+            <ul class="contact-list">
+              <li><strong>E-mail:</strong> contato@cruzvermelha.org.br</li>
+              <li><strong>Telefone:</strong> (00) 0000-0000</li>
+              <li><strong>Endereço:</strong> Avenida Exemplo, 123 – Centro – Cidade/UF</li>
+            </ul>
+          </div>
+
+          <form class="contact-form">
+            <h3>Envie uma mensagem</h3>
+            <div class="form-field">
+              <label for="name">Nome</label>
+              <input id="name" type="text" required />
+            </div>
+            <div class="form-field">
+              <label for="email">E-mail</label>
+              <input id="email" type="email" required />
+            </div>
+            <div class="form-field">
+              <label for="message">Mensagem</label>
+              <textarea id="message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Enviar mensagem</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-content">
+        <p>© 2025 Cruz Vermelha Brasileira. Conteúdo ilustrativo para fins de demonstração.</p>
+        <p class="footer-note">
+          Este site demonstra apenas a interface de doação e não processa pagamentos reais.
+        </p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

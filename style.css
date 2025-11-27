@@ -1,0 +1,715 @@
+/* Reset e configurações básicas ------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111827;
+  background-color: #f9fafb;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* Utilitários ------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section {
+  padding: 4rem 0;
+  /* Visibilidade das seções (JS Toggle) */
+  display: none;
+}
+
+.section.is-visible {
+  display: block;
+}
+
+.section-alt {
+  background-color: #fef2f2;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #b91c1c;
+  margin-bottom: 1.5rem;
+}
+
+.section-content > p {
+  max-width: 56rem;
+  margin-bottom: 1rem;
+}
+
+/* Cabeçalho e navegação --------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #b91c1c;
+  color: #f9fafb;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.15);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.brand-slogan {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* Navegação */
+.main-nav {
+  position: relative;
+}
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #f9fafb;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: #fee2e2;
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 0.3rem 0.1rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.nav-link.is-active {
+  color: #ffffff;
+  border-color: #f97316;
+}
+
+/* Hero + calculadora de doação -------------------------------------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2.5fr);
+  gap: 3rem;
+  align-items: flex-start;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.hero-text {
+  max-width: 38rem;
+}
+
+.hero-title {
+  font-size: 2.1rem;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 1.75rem;
+}
+
+.hero-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.hero-stat {
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background-color: #fee2e2;
+  color: #7f1d1d;
+  min-width: 8.5rem;
+}
+
+.hero-stat-number {
+  display: block;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.hero-stat-label {
+  display: block;
+  font-size: 0.85rem;
+}
+
+/* Cartão da calculadora (Container Principal) */
+.donation-calculator {
+  background-color: #ffffff;
+  border-radius: 1.25rem;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.12);
+}
+
+.donation-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #b91c1c;
+  margin-bottom: 0.5rem;
+}
+
+.donation-description {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+/* Botões de valores rápidos */
+.quick-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.amount-btn {
+  flex: 1 1 calc(50% - 0.5rem);
+  min-width: 5rem;
+  border-radius: 999px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #fecaca;
+  background-color: #fff7ed;
+  color: #7f1d1d;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease,
+    box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.amount-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(248, 113, 113, 0.3);
+}
+
+.amount-btn.is-active {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+  color: #ffffff;
+}
+
+/* Campo de valor personalizado */
+.donation-input-wrapper {
+  margin-bottom: 0.75rem;
+}
+
+.donation-label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.donation-input-group {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  background-color: #fee2e2;
+}
+
+.currency-prefix {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #7f1d1d;
+  margin-right: 0.25rem;
+}
+
+.donation-input {
+  width: 7rem;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  padding: 0.3rem 0.25rem;
+  outline: none;
+}
+
+.donation-input::-webkit-outer-spin-button,
+.donation-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.donation-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.donation-help {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Botão principal (CTA) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.6rem 1.5rem;
+  border: none;
+  background-image: linear-gradient(to right, #b91c1c, #dc2626);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(185, 28, 28, 0.4);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(185, 28, 28, 0.5);
+  filter: brightness(1.03);
+}
+
+/* =========================================
+   ESTILO FINAL: CARDS DE IMPACTO
+   ========================================= */
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.impact-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 1.2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 180px; /* Garante altura uniforme */
+}
+
+.impact-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon-bubble {
+  width: 45px;
+  height: 45px;
+  background: #fff5f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s;
+}
+
+.impact-card:hover .card-icon-bubble {
+  transform: scale(1.1);
+}
+
+/* Título do Item: Permite quebra de linha e evita cortes */
+.impact-label {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+  white-space: normal !important;
+  text-overflow: clip !important;
+  overflow: visible !important;
+}
+
+/* Subtítulo discreto (Categoria) */
+.impact-subtitle {
+  font-size: 0.7rem;
+  color: #999;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: auto; /* Empurra o conteúdo abaixo */
+}
+
+/* Detalhamento (Aparece no Hover) */
+.card-detail {
+  font-size: 0.7rem;
+  color: #666;
+  background: #fff;
+  padding: 5px;
+  margin: 5px 0;
+  line-height: 1.3;
+  /* Estado inicial: Escondido */
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+/* Estado Hover: Visível */
+.impact-card:hover .card-detail {
+  max-height: 60px;
+  opacity: 1;
+  margin-bottom: 10px;
+}
+
+/* Caixa de valores e qtd */
+.impact-value-box {
+  background-color: #f7f9fc;
+  padding: 0.6rem;
+  border-radius: 12px;
+  width: 100%;
+}
+
+.impact-price {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #cc0000;
+}
+
+.impact-qtd {
+  font-size: 0.7rem;
+  color: #666;
+  display: block;
+}
+
+/* Botão "Ver Mais" dentro do grid */
+.show-more-container {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.btn-show-more {
+  background: white;
+  border: 1px solid #e0e0e0;
+  color: #666;
+  padding: 0.6rem 1.2rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: 0.2s;
+}
+
+.btn-show-more:hover {
+  border-color: #cc0000;
+  color: #cc0000;
+}
+
+/* Seção sobre / institucional --------------------------------------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.about-card {
+  padding: 1.25rem;
+  border-radius: 0.9rem;
+  background-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.about-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: #b91c1c;
+}
+
+.about-card ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.95rem;
+}
+
+/* Transparência ------------------------------------------------------ */
+.transparency-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 2fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.transparency-card {
+  padding: 1.25rem;
+  border-radius: 0.9rem;
+  background-color: #fff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.transparency-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+/* Projetos ----------------------------------------------------------- */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.project-card {
+  padding: 1.25rem;
+  border-radius: 0.9rem;
+  background-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.project-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: #b91c1c;
+}
+
+/* Depoimentos -------------------------------------------------------- */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.testimonial {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.testimonial blockquote {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.testimonial figcaption {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Contato ------------------------------------------------------------ */
+.contact-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.7fr);
+  gap: 2rem;
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+}
+
+.contact-list li + li {
+  margin-top: 0.35rem;
+}
+
+.contact-form {
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.contact-form h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #b91c1c;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.85rem;
+}
+
+.form-field label {
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.form-field input,
+.form-field textarea {
+  padding: 0.55rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  border-color: #b91c1c;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35);
+  outline: none;
+}
+
+/* Rodapé ------------------------------------------------------------- */
+.site-footer {
+  padding: 1.5rem 0;
+  background-color: #111827;
+  color: #e5e7eb;
+  margin-top: 2rem;
+}
+
+.footer-content {
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.footer-note {
+  margin-top: 0.35rem;
+  color: #9ca3af;
+}
+
+/* RESPONSIVIDADE (MEDIA QUERIES) - SEMPRE NO FINAL DO ARQUIVO ---------------- */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .donation-calculator {
+    order: -1;
+  }
+
+  .projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .testimonials-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contact-section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .header-content {
+    padding: 0.75rem 1rem;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .nav-list {
+    position: absolute;
+    right: 1rem;
+    top: 3rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background-color: #b91c1c;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+    display: none;
+  }
+
+  .nav-list.is-open {
+    display: flex;
+  }
+
+  .hero-highlights {
+    gap: 0.75rem;
+  }
+
+  .impact-grid {
+    /* Mantém pelo menos 2 colunas se o celular não for minúsculo, ou 1 se for muito pequeno */
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .about-grid,
+  .transparency-grid,
+  .projects-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
