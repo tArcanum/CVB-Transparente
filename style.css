@@ -449,29 +449,32 @@ textarea {
 
 /* Botão "Ver Mais" dentro do grid */
 .show-more-container {
-  grid-column: 1 / -1;
-  text-align: center;
-  margin-top: 1rem;
+  grid-column: 1 / -1; /* Força ocupar todas as colunas do grid */
+  display: flex;
+  justify-content: center; /* Centraliza o botão */
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;    /* Espaço acima (afasta dos cards) */
+  margin-bottom: 30px; /* Espaço abaixo (afasta do botão 'Quero doar') */
+  padding: 10px 0;
 }
 
 .btn-show-more {
-  background: white;
-  border: 1px solid #e0e0e0;
-  color: #666;
-  padding: 0.6rem 1.2rem;
-  border-radius: 30px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 20px;
   cursor: pointer;
+  color: #555;
+  font-size: 0.9rem;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  transition: 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-show-more:hover {
-  border-color: #cc0000;
-  color: #cc0000;
+  background: #f8f8f8;
+  border-color: #ccc;
 }
-
 /* Seção sobre / institucional --------------------------------------- */
 .about-grid {
   display: grid;
