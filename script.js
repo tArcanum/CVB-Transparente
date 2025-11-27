@@ -1,8 +1,6 @@
-// script.js - VERSÃO FINAL: ALGORITMO DE QUOCIENTES (VARIEDADE + PRIORIDADE)
 // ============================================================================
-// DADOS DOS ITENS
+// 1. DADOS (ITENS_DB)
 // ============================================================================
-
 const ITENS_DB = [
   { nome: "Cestas básicas – Compra de alimentos básicos", categoria: "Alimentação", custo: 200.0, qtde: 4400, prioridade: 100 },
   { nome: "Cestas básicas – Itens de proteína", categoria: "Alimentação", custo: 80.0, qtde: 5000, prioridade: 100 },
@@ -119,99 +117,351 @@ const ITENS_DB = [
   { nome: "Capacitação em ética e integridade – Avaliação e acompanhamento", categoria: "Governança", custo: 1000.0, qtde: 8, prioridade: 20 },
 ];
 
-// ============================================================================
-// INICIALIZAÇÃO E CONFIGURAÇÃO DOS DADOS
-// ============================================================================
-
-// GERAÇÃO DE IDs ÚNICOS
-ITENS_DB.forEach((item, index) => {
-  item.id = index; 
-});
-
-// ============================================================================
-// LÓGICA DO SOLVER (Algoritmo de Quocientes / D'Hondt Adaptado)
-// ============================================================================
-
-function calculateDonation(orcamento) {
-  // 1. Prepara o estado inicial
-  // Cada item começa com R$ 0 alocados
-  const allocation = ITENS_DB.map(item => ({
-    ...item,
-    alocado: 0,
-    qtde_cotas: 0 // Cotas de R$ 1,00 (metafóricas)
-  }));
-
-  let remainingBudget = orcamento;
-  
-  // Define o "passo" da doação. 
-  // Se o orçamento for gigante (ex: 1 milhão), o passo aumenta para não travar o browser.
-  // Se for pequeno (ex: 50 reais), o passo é de R$ 1,00.
-  const step = Math.max(1, remainingBudget / 3000); 
-
-  // 2. Loop de Distribuição
-  while (remainingBudget >= step) {
-    
-    // Encontra o item com o maior "Score de Necessidade"
-    let winner = null;
-    let maxScore = -1;
-
-    for (let i = 0; i < allocation.length; i++) {
-      const item = allocation[i];
-
-      // Se o item já está 100% financiado (alocado >= custo total do estoque), pula
-      const custoTotalEstoque = item.custo * item.qtde;
-      if (item.alocado >= custoTotalEstoque) continue;
-
-      // FÓRMULA MÁGICA: Score = Prioridade / (Valor Já Alocado + step)
-      // Isso garante que itens de alta prioridade ganhem muito no começo,
-      // mas conforme enchem, o score cai e dá vez aos menores.
-      const score = item.prioridade / (item.alocado + step);
-
-      if (score > maxScore) {
-        maxScore = score;
-        winner = item;
-      }
+/**
+ * ============================================================================
+ * 2. ESTRUTURA DE DADOS: MIN-HEAP
+ * Essencial para replicar a lógica do Python heapq
+ * ============================================================================
+ */
+class MinHeap {
+    constructor() {
+        this.heap = [];
     }
 
-    // Se não sobrou ninguém pra receber dinheiro (tudo 100%), para.
-    if (!winner) break;
+    push(item) {
+        this.heap.push(item);
+        this._siftUp();
+    }
 
-    // 3. Aloca o dinheiro para o vencedor da rodada
-    // Garante que não aloca mais do que o necessário para fechar o estoque
-    const spaceLeft = (winner.custo * winner.qtde) - winner.alocado;
-    const amountToGive = Math.min(step, spaceLeft, remainingBudget);
+    pop() {
+        if (this.isEmpty()) return null;
+        const root = this.heap[0];
+        const last = this.heap.pop();
+        if (!this.isEmpty()) {
+            this.heap[0] = last;
+            this._siftDown();
+        }
+        return root;
+    }
 
-    winner.alocado += amountToGive;
-    remainingBudget -= amountToGive;
-  }
+    peek() {
+        return this.isEmpty() ? null : this.heap[0];
+    }
 
-  // 4. Formatação Final para a Interface
-  let itensEscolhidos = [];
-  allocation.forEach((item) => {
-     // Calcula quantas "unidades" ou fração de unidade isso representa
-     let qtdUnidades = item.alocado / item.custo;
-     
-     if (qtdUnidades > 0) {
-       itensEscolhidos.push({
-         nome: item.nome,
-         categoria: item.categoria,
-         qtd: qtdUnidades, // Qtd fracionada (ex: 0.5 ou 2.3)
-         subtotal: item.alocado,
-         custo_real_unitario: item.custo, 
-         prioridade: item.prioridade
-       });
-     }
-  });
+    isEmpty() {
+        return this.heap.length === 0;
+    }
 
-  return {
-    itens_escolhidos: itensEscolhidos.sort((a, b) => b.subtotal - a.subtotal),
-    tipo_estrategia: "Distribuição Proporcional por Prioridade"
-  };
+    // Compara items pelo elemento 'cov' (cobertura)
+    _compare(a, b) {
+        return a.cov - b.cov;
+    }
+
+    _siftUp() {
+        let nodeIdx = this.heap.length - 1;
+        while (nodeIdx > 0) {
+            const parentIdx = Math.floor((nodeIdx - 1) / 2);
+            if (this._compare(this.heap[nodeIdx], this.heap[parentIdx]) < 0) {
+                [this.heap[nodeIdx], this.heap[parentIdx]] = [this.heap[parentIdx], this.heap[nodeIdx]];
+                nodeIdx = parentIdx;
+            } else {
+                break;
+            }
+        }
+    }
+
+    _siftDown() {
+        let nodeIdx = 0;
+        while (true) {
+            const leftChildIdx = 2 * nodeIdx + 1;
+            const rightChildIdx = 2 * nodeIdx + 2;
+            let swapIdx = null;
+
+            if (leftChildIdx < this.heap.length) {
+                if (this._compare(this.heap[leftChildIdx], this.heap[nodeIdx]) < 0) {
+                    swapIdx = leftChildIdx;
+                }
+            }
+
+            if (rightChildIdx < this.heap.length) {
+                if (
+                    (swapIdx === null && this._compare(this.heap[rightChildIdx], this.heap[nodeIdx]) < 0) ||
+                    (swapIdx !== null && this._compare(this.heap[rightChildIdx], this.heap[leftChildIdx]) < 0)
+                ) {
+                    swapIdx = rightChildIdx;
+                }
+            }
+
+            if (swapIdx !== null) {
+                [this.heap[nodeIdx], this.heap[swapIdx]] = [this.heap[swapIdx], this.heap[nodeIdx]];
+                nodeIdx = swapIdx;
+            } else {
+                break;
+            }
+        }
+    }
 }
 
-// ============================================================================
-// INTERFACE (UI)
-// ============================================================================
+/**
+ * ============================================================================
+ * 3. ALGORITMO OTIMIZADO (RÉPLICA EXATA PYTHON)
+ * ============================================================================
+ */
+
+// Prepara os dados: Adiciona IDs e Tokeniza itens caros (> R$10)
+function prepareData(rawItems) {
+    return rawItems.map((item, index) => {
+        const custo = item.custo;
+        let isTokenizado = false;
+        let custoProcessamento = custo;
+        let qtdeProcessamento = item.qtde;
+        const valorCotaPadrao = 1.0;
+
+        // Se o custo for alto, quebra em tokens de ~1 real
+        if (custo > 10.0) {
+            isTokenizado = true;
+            custoProcessamento = valorCotaPadrao;
+            // Quantidade de cotas = (Custo Total do Item / 1.0) * Qtde Itens
+            // NOTA: Para bater exatamente com a lógica Python "valor_cota_padrao",
+            // ajustamos a quantidade para ser proporcional.
+            const cotasPorUnidade = custo / valorCotaPadrao;
+            qtdeProcessamento = Math.ceil(item.qtde * cotasPorUnidade);
+        }
+
+        return {
+            id: index,
+            nome: item.nome,
+            categoria: item.categoria,
+            prioridade: item.prioridade,
+            
+            // Dados para o algoritmo (Tokenizados ou não)
+            custo: custoProcessamento, 
+            qtde: qtdeProcessamento,
+            
+            // Dados Originais
+            custo_real_original: custo, // val_real no python
+            is_tokenizado: isTokenizado
+        };
+    });
+}
+
+// Algoritmo Core: allocate_balanced (Réplica do knapsack_solver.py)
+function allocateBalanced(itemsDisponiveis, orcamentoDisponivel) {
+    let resultado = {}; // ID -> Qtde Comprada (cotas)
+    itemsDisponiveis.forEach(i => resultado[i.id] = 0);
+
+    let custoTotalAlocado = 0.0;
+    let orcamentoRestante = orcamentoDisponivel;
+
+    // Mapa auxiliar para acesso rápido
+    const itemData = {};
+    itemsDisponiveis.forEach(item => {
+        itemData[item.id] = {
+            item: item,
+            val_real: item.custo_real_original,
+            custo: item.custo, // custo da cota (token)
+            qtde: item.qtde,   // estoque total de cotas
+            prio: item.prioridade
+        };
+    });
+
+    let targetLevel = 1.0; // Começa em 1.0 (Python logic)
+
+    while (orcamentoRestante >= 0.01) {
+        
+        // 1. Identifica itens "ativos"
+        let activeCandidates = [];
+        
+        itemsDisponiveis.forEach(item => {
+            const id = item.id;
+            const bought = resultado[id];
+            
+            // Verifica estoque
+            if (bought >= item.qtde) return; 
+
+            // Calcula cobertura atual
+            // Fórmula Python: curr_cov = (bought * item["custo"]) / item_data[id_]["val_real"]
+            // bought é qtd de cotas. item["custo"] é preço da cota.
+            const currCov = (bought * itemData[id].custo) / itemData[id].val_real;
+
+            if (currCov < targetLevel - 1e-6) {
+                // Checa se tem dinheiro para pelo menos 1 unidade/cota
+                if (orcamentoRestante >= itemData[id].custo) {
+                    activeCandidates.push({
+                        item: item,
+                        cov: currCov
+                    });
+                }
+            }
+        });
+
+        // 2. Se não tem candidatos para essa meta, aumenta a meta ou encerra
+        if (activeCandidates.length === 0) {
+            // Verifica se sobrou estoque em algum lugar
+            const anyStock = itemsDisponiveis.some(i => resultado[i.id] < i.qtde);
+            if (!anyStock) break; // Acabou estoque de tudo
+
+            targetLevel += 1.0; // Sobe o nível (Python: target_level += 1.0)
+            continue;
+        }
+
+        // 3. Filtra apenas a ELITE (Maior Prioridade Disponível)
+        const maxPrio = Math.max(...activeCandidates.map(c => c.item.prioridade));
+        
+        // Cria Min-Heap
+        const heap = new MinHeap();
+        activeCandidates.forEach(cand => {
+            if (cand.item.prioridade === maxPrio) {
+                // Heap armazena { cov, cost, id }
+                // Mas aqui guardamos objeto completo para facilitar
+                heap.push({
+                    cov: cand.cov,
+                    cost: itemData[cand.item.id].custo,
+                    id: cand.item.id
+                });
+            }
+        });
+
+        // 4. Processamento em LOTE dentro do Heap
+        while (!heap.isEmpty() && orcamentoRestante >= 0.01) {
+            const top = heap.pop(); // Remove o menor (menor cobertura)
+            const id = top.id;
+            const cov = top.cov;
+            const cost = top.cost;
+
+            // Descobre cobertura do próximo para calcular o GAP
+            const nextNode = heap.peek();
+            let nextCov = nextNode ? nextNode.cov : targetLevel;
+
+            let gap = nextCov - cov;
+
+            // Variável para qtd a comprar
+            let quotasToBuy = 0;
+
+            if (gap < 1e-9) {
+                quotasToBuy = 1;
+            } else {
+                // Mágica Matemática do Python:
+                // quotas_float = (gap * val_real) / cost
+                const valReal = itemData[id].val_real;
+                const quotasFloat = (gap * valReal) / cost;
+                quotasToBuy = Math.floor(quotasFloat);
+                if (quotasToBuy < 1) quotasToBuy = 1;
+            }
+
+            // Restrições (Orçamento e Estoque)
+            const stockLeft = itemData[id].qtde - resultado[id];
+            quotasToBuy = Math.min(quotasToBuy, stockLeft);
+
+            const maxAfford = Math.floor(orcamentoRestante / cost);
+            quotasToBuy = Math.min(quotasToBuy, maxAfford);
+
+            if (quotasToBuy <= 0) {
+                continue;
+            }
+
+            // Executa a compra
+            const totalCost = quotasToBuy * cost;
+            resultado[id] += quotasToBuy;
+            orcamentoRestante -= totalCost;
+            custoTotalAlocado += totalCost;
+
+            // Recalcula nova cobertura
+            const newBought = resultado[id];
+            const newCov = (newBought * cost) / itemData[id].val_real;
+
+            // Se ainda não terminou e está abaixo da meta, volta pro Heap
+            if (newBought < itemData[id].qtde && newCov < targetLevel - 1e-6) {
+                if (orcamentoRestante >= cost) {
+                    heap.push({
+                        cov: newCov,
+                        cost: cost,
+                        id: id
+                    });
+                }
+            }
+        }
+    }
+
+    return { allocated: resultado, remainingBudget: orcamentoRestante };
+}
+
+// Wrapper Principal (Bridge)
+function calculateDonation(amount) {
+    if (typeof ITENS_DB === 'undefined') {
+        console.error("ERRO: ITENS_DB não carregado.");
+        return { tipo_estrategia: "Erro", itens_escolhidos: [] };
+    }
+
+    // 1. Prepara dados (Tokeniza)
+    const allItems = prepareData(ITENS_DB);
+
+    // 2. Define Buckets (Regra do Python: allocate)
+    const isMicro = amount < 10.0;
+    const opPct = isMicro ? 0.0 : 0.20; // 20%
+    const impPct = isMicro ? 1.0 : 0.80; // 80%
+
+    let orcOp = amount * opPct;
+    let orcImp = amount * impPct;
+
+    // Separa por prioridade < 60 e >= 60
+    const itemsOp = allItems.filter(i => i.prioridade < 60);
+    const itemsImp = allItems.filter(i => i.prioridade >= 60);
+
+    // 3. Executa Alocação
+    const resOp = allocateBalanced(itemsOp, orcOp);
+    
+    // Sobra do operacional flui para impacto
+    // Python: allocate_balanced(itens_imp, orc_imp + (orc_op - custo_op))
+    // Aqui sabemos que orcOp - custoOp = resOp.remainingBudget
+    orcImp += resOp.remainingBudget;
+
+    const resImp = allocateBalanced(itemsImp, orcImp);
+
+    // 4. Formatação de Saída
+    let itensEscolhidos = [];
+
+    const processResult = (allocationMap, sourceItems) => {
+        sourceItems.forEach(item => {
+            const qtdTokensComprados = allocationMap[item.id] || 0;
+            if (qtdTokensComprados > 0) {
+                const totalGasto = qtdTokensComprados * item.custo;
+                
+                // Reconverte para unidades "reais"
+                // Se item.custo (token) != item.custo_real_original, então foi tokenizado
+                let qtdReal = totalGasto / item.custo_real_original;
+
+                itensEscolhidos.push({
+                    id: item.id,
+                    nome: item.nome,
+                    categoria: item.categoria,
+                    prioridade: item.prioridade,
+                    subtotal: totalGasto,
+                    custo_real_unitario: item.custo_real_original,
+                    qtd: Number(qtdReal.toFixed(2))
+                });
+            }
+        });
+    };
+
+    processResult(resOp.allocated, itemsOp);
+    processResult(resImp.allocated, itemsImp);
+
+    // Ordena por subtotal
+    itensEscolhidos.sort((a, b) => b.subtotal - a.subtotal);
+
+    return {
+        tipo_estrategia: isMicro ? "Foco Total em Impacto Direto" : "Distribuição Balanceada (80% Impacto / 20% Operacional)",
+        itens_escolhidos: itensEscolhidos
+    };
+}
+
+
+/**
+ * ============================================================================
+ * 4. INTERFACE (Frontend UI)
+ * ============================================================================
+ */
 
 const CATEGORY_ICONS = {
   "Alimentação": "🍎", "Higiene": "🧼", "Medicamentos": "💊",
@@ -332,15 +582,25 @@ function setupDonationCalculator() {
     const valorFormatado = item.subtotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     
     // Porcentagem
-    let rawPct = (item.subtotal / item.custo_real_unitario) * 100;
+    let rawPct = 0;
+    if (item.custo_real_unitario > 0) {
+        rawPct = (item.subtotal / item.custo_real_unitario) * 100;
+    }
+    
     let porcentagemDisplay;
-    if (rawPct < 1) {
+    if (rawPct < 1 && rawPct > 0) {
        porcentagemDisplay = rawPct.toFixed(1);
-       if (porcentagemDisplay === "0.0") porcentagemDisplay = "0.1";
     } else {
        porcentagemDisplay = Math.round(rawPct);
     }
-    const textoImpacto = `<strong>${porcentagemDisplay}%</strong> do valor da unidade`;
+    
+    // Ajuste visual para quando compra múltiplas unidades
+    let textoImpacto;
+    if (rawPct > 100) {
+        textoImpacto = `<strong>${item.qtd.toFixed(1)}</strong> unidades`;
+    } else {
+        textoImpacto = `<strong>${porcentagemDisplay}%</strong> de uma unidade`;
+    }
 
     card.innerHTML = `
       <div class="card-icon-bubble">${icon}</div>
@@ -359,7 +619,7 @@ function setupDonationCalculator() {
     if(data.tipo_estrategia && helpText) helpText.innerHTML = `<strong>Resultado:</strong> ${data.tipo_estrategia}`;
 
     if (!data.itens_escolhidos || data.itens_escolhidos.length === 0) {
-      grid.innerHTML = `<p style="text-align:center; color:#888; grid-column:1/-1;">Valor insuficiente.</p>`;
+      grid.innerHTML = `<p style="text-align:center; color:#888; grid-column:1/-1;">Valor insuficiente para comprar itens prioritários ou estoque esgotado.</p>`;
       return;
     }
 
@@ -390,7 +650,10 @@ function setupDonationCalculator() {
   const handleUpdate = (val) => {
     clearTimeout(timerId);
     timerId = setTimeout(() => {
-        const num = parseFloat(val);
+        // Limpa formatação de moeda se houver (ex: R$ 1.000,00 -> 1000.00)
+        let cleanVal = String(val).replace(/[^\d,.-]/g, '').replace(',','.');
+        const num = parseFloat(cleanVal);
+        
         if (!isNaN(num) && num > 0) {
             const result = calculateDonation(num);
             renderResults(result);
@@ -405,5 +668,6 @@ function setupDonationCalculator() {
     handleUpdate(btn.dataset.amount);
   }));
   
-  handleUpdate(input.value);
+  // Roda uma vez se já tiver valor no input
+  if (input.value) handleUpdate(input.value);
 }
